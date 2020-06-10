@@ -1,0 +1,155 @@
+<!DOCTYPE html>
+<html>
+    <head>
+        <title>Jogo da Cobrinha</title>
+        <meta charset="UTF-8">
+    </head>
+    <style type="text/css" media="screen">
+        @font-face {
+            font-family: fonte8bits;
+            src: url('8-BIT-WONDER.TTF') format('truetype');
+        }
+
+        h1 {
+			text-align:center;
+			font:27 px/25px fonte8bits, Arial, Tahoma, Sans-serif;
+        }
+        
+        h2 {
+			text-align:center;
+			font:40px/25px fonte8bits, Arial, Tahoma, Sans-serif;
+		}
+	</style>
+    <body>
+        <div style="font-family: 'Franklin Gothic Medium', 'Arial Narrow', Arial, sans-serif; text-align: center;">
+            <h1>Jogo da Cobrinha</h1>
+            <canvas id="stage" width="400" height="400"></canvas>
+            <h2>Placar</h2>
+            <h2 id = "placar">0</h2>
+        </div>
+        <script type="text/javascript">
+            window.onload = function (){
+                var stage = document.getElementById('stage');
+                var ctx = stage.getContext("2d");
+                const recuo = -1
+                const resetCauda = 3;
+                const avanco = 1;
+                var direcaoX = 1;
+                var direcaoY = 0;
+                var cobraY = 15;
+                var cobraX = 10
+                var tp = 20;
+                var qp = 20;
+                var appleX = 15;
+                var appleY = 15;
+                var cobra = [];
+                var cauda = resetCauda;
+                var placar = parseInt(document.getElementById('placar').textContent);
+                var placarHtml = document.getElementById('placar'); 
+
+                telaInicial();
+                document.onkeypress = function (){
+                    var turno = setInterval(function(){
+                        document.addEventListener("keydown", keyPush);
+                        cobraX += direcaoX;
+                        cobraY += direcaoY;
+                        if(cobraX < 0){
+                            cobraX = qp -1;
+                        }
+                        if(cobraX > qp - 1){
+                            cobraX = 0;
+                        }
+                        if(cobraY < 0){
+                            cobraY = qp -1;
+                        }
+                        if(cobraY > qp -1){
+                            cobraY = 0;
+                        }
+                        
+                        ctx.fillStyle = "black";
+                        ctx.fillRect(0,0,stage.width, stage.height);
+                        ctx.fillStyle = "red";
+                        ctx.fillRect(appleX * tp, appleY * tp, tp, tp);
+                        ctx.fillStyle = "green";
+                        for(var i = 0; i< cobra.length; i++){
+                            ctx.fillRect(cobra[i].x * tp, cobra[i].y * tp, tp - 1, tp - 1);
+                            if(cobra[i].x == cobraX && cobra[i].y == cobraY && cobra.length > 3){
+                                direcaoX = direcaoY = 0;
+                                cauda = resetCauda;
+                                
+                                clearInterval(turno);
+                                telaGameOver();
+                                
+                            }
+                        }
+
+                        cobra.push({x:cobraX, y:cobraY});
+                        while(cobra.length > cauda){
+                            cobra.shift();
+                        }
+
+                        if(appleX == cobraX && appleY == cobraY){
+                            cauda++;
+                            placar++;
+                            placarHtml.innerHTML = placar;
+                            appleX = Math.floor(Math.random()*qp);
+                            appleY = Math.floor(Math.random()*qp);
+                        }
+                    }, 120);
+                    
+                }
+                
+                function telaInicial(){
+                    ctx.fillStyle = "black";
+                    ctx.fillRect(0,0,stage.width, stage.height);
+                    ctx.font = "40px fonte8bits";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillStyle = "White";
+                    ctx.fillText("Anaconda",stage.width/2,170);
+                    ctx.font = "15px fonte8bits";
+                    ctx.fillText("Aperte <espaco> para jogar",200,250);
+                }
+
+                function keyPush(event){
+                        console.log(event.keyCode);
+                    switch(event.keyCode){
+                        case 37://esquerda
+                            direcaoX = recuo;
+                            direcaoY = 0;
+                            break;
+                        case 38://pra cima
+                            direcaoX = 0;
+                            direcaoY = recuo;
+                            break;
+                        case 39://direita
+                            direcaoX = avanco;
+                            direcaoY = 0;
+                            break;
+                        case 40://pra baixo
+                            direcaoX = 0;
+                            direcaoY = avanco;
+                            break;
+                        case 32: //espaço
+                            break;
+                        default:
+                            break;
+                    }
+                }
+
+                function telaGameOver(){
+                    ctx.fillStyle = "black";
+                    ctx.fillRect(0,0,stage.width, stage.height);
+                    ctx.font = "50px Tahoma";
+                    ctx.textAlign = "center";
+                    ctx.textBaseline = "middle";
+                    ctx.fillStyle = "White";
+                    ctx.fillText("GAME OVER",stage.width/2,stage.height/2);
+                    document.onkeypress = function (){
+                        location = location;
+                    }
+                }
+            }
+        </script>
+    </body>
+</html>
